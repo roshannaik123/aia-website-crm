@@ -328,6 +328,10 @@ const StudentList = ({ enable }) => {
     ...(enable == "recentpassout"
       ? [
           {
+            header: "Passout Year",
+            accessorKey: "student_passout_year",
+          },
+          {
             header: "Passout",
             accessorKey: "student_recent_passout",
             cell: ({ row }) => {

@@ -23,7 +23,7 @@ export default function LoginForm({
     >
       <div className="flex items-center gap-1 p-2 rounded-md mb-8 ">
         <img
-          src="https://aia.in.net/crm/public/assets/images/logo/new_retina_logos.webp"
+          src="https://aia.in.net/webapi/public/assets/images/web_images/new_logo.webp"
           alt="AIA Logo"
         />
       </div>
