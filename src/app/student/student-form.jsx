@@ -93,6 +93,7 @@ const initialState = {
   student_youtube_image_alt: "",
   student_screenshot_image: "",
   student_screenshot_image_alt: "",
+  student_passout_year: "",
 };
 
 const StudentForm = () => {
@@ -408,6 +409,7 @@ const StudentForm = () => {
       "student_recent_passout",
       data.student_recent_passout || "",
     );
+    formData.append("student_passout_year", data.student_passout_year || "");
     formData.append(
       "student_have_office_image",
       data.student_have_office_image || "",
@@ -1003,6 +1005,15 @@ const StudentForm = () => {
                       {errors.student_image_alt}
                     </p>
                   )}
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Passout Year </label>
+                  <Input
+                    value={data.student_passout_year}
+                    onChange={(e) =>
+                      setData({ ...data, student_passout_year: e.target.value })
+                    }
+                  />
                 </div>
               </>
             )}
