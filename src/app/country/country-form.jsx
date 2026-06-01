@@ -21,6 +21,7 @@ const initialState = {
   country_longitude: "",
   country_city: "",
   country_status: "Active",
+  country_reason: "",
 };
 
 const CountryForm = ({ isOpen, onClose, countryId }) => {
@@ -52,6 +53,7 @@ const CountryForm = ({ isOpen, onClose, countryId }) => {
           country_longitude: res.data.country_longitude || "",
           country_city: res.data.country_city || "",
           country_status: res.data.country_status || "Active",
+          country_reason: res.data.country_reason || "",
         });
       } catch (err) {
         toast.error("Failed to load country data");
@@ -84,7 +86,7 @@ const CountryForm = ({ isOpen, onClose, countryId }) => {
     formData.append("country_longitude", data.country_longitude);
     formData.append("country_city", data.country_city);
     formData.append("country_status", data.country_status);
-
+    formData.append("country_reason", data.country_reason || "");
     try {
       const res = await submitCountry({
         url: isEditMode ? `${COUNTRY_API.byId(countryId)}` : COUNTRY_API.list,
@@ -172,6 +174,16 @@ const CountryForm = ({ isOpen, onClose, countryId }) => {
             {errors.country_longitude && (
               <p className="text-xs text-red-500">{errors.country_longitude}</p>
             )}
+          </div>
+          <div className="col-span-2">
+            <label className="text-sm font-medium">Region</label>
+            <Input
+              placeholder="Region"
+              value={data.country_reason}
+              onChange={(e) =>
+                setData({ ...data, country_reason: e.target.value })
+              }
+            />
           </div>
         </div>
 
