@@ -32,6 +32,11 @@ const CountryList = () => {
     { header: "Latitude", accessorKey: "country_latitude" },
     { header: "Longitude", accessorKey: "country_longitude" },
     {
+      header: "Region",
+      accessorKey: "country_reason",
+      cell: ({ row }) => row.original.country_reason || "-",
+    },
+    {
       header: "Status",
       accessorKey: "country_status",
       cell: ({ row }) => {

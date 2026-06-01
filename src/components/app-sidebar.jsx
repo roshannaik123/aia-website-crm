@@ -56,6 +56,7 @@ const NAVIGATION_CONFIG = {
       icon: Globe,
       isActive: false,
     },
+    
     NEWSLETTERLIST: {
       title: "Newsletter List",
       url: "/newsletter-list",

@@ -55,6 +55,12 @@ const CompanyList = () => {
       enableSorting: false,
     },
     {
+      header: "Industry Type",
+      accessorKey: "student_company_industry_type",
+      cell: ({ row }) => row.original.student_company_industry_type || "-",
+      enableSorting: false,
+    },
+    {
       header: "Status",
       accessorKey: "student_company_status",
       cell: ({ row }) => (

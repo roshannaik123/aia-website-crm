@@ -22,6 +22,7 @@ const initialState = {
   student_company_image_alt: "",
   student_company_status: "Active",
   student_company_image: null,
+  student_company_industry_type: "",
 };
 const CompanyDialog = ({ open, onClose, companyId }) => {
   const isEdit = Boolean(companyId);
@@ -53,6 +54,8 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
           student_company_image_alt: data.student_company_image_alt,
           student_company_status: data.student_company_status,
           student_company_image: null,
+          student_company_industry_type:
+            data.student_company_industry_type || "",
         });
         const IMAGE_FOR = "Student Company";
         const baseUrl = getImageBaseUrl(res?.image_url, IMAGE_FOR);
@@ -92,17 +95,21 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
     formDataObj.append("student_company_name", formData.student_company_name);
     formDataObj.append(
       "student_company_image_alt",
-      formData.student_company_image_alt
+      formData.student_company_image_alt,
     );
     formDataObj.append(
       "student_company_status",
-      formData.student_company_status
+      formData.student_company_status,
+    );
+    formDataObj.append(
+      "student_company_industry_type",
+      formData.student_company_industry_type || "",
     );
 
     if (formData.student_company_image instanceof File) {
       formDataObj.append(
         "student_company_image",
-        formData.student_company_image
+        formData.student_company_image,
       );
     }
     try {
@@ -174,6 +181,7 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
               value={formData.student_company_image_alt}
               onChange={handleChange}
             />
+
             <div className="flex justify-between">
               {errors.student_company_image_alt && (
                 <p className="text-sm text-red-500">
@@ -199,6 +207,43 @@ const CompanyDialog = ({ open, onClose, companyId }) => {
               requiredDimensions={[150, 150]}
             />
           </div>
+          <div>
+            <Label>Industry Type</Label>
+            <input
+              type="text"
+              placeholder="Enter Industry Type"
+              className="w-full border rounded-md p-2"
+              value={formData.student_company_industry_type}
+              onChange={(e) =>
+                setFormData((p) => ({
+                  ...p,
+                  student_company_industry_type: e.target.value,
+                }))
+              }
+            />
+          </div>
+          {/* <div>
+            <Label>Industry Type</Label>
+            <Select
+              name="student_company_industry_type"
+              value={formData.student_company_industry_type}
+              onValueChange={(value) =>
+                setFormData((p) => ({
+                  ...p,
+                  student_company_industry_type: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Industry Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Technology">Technology</SelectItem>
+                <SelectItem value="Finance">Finance</SelectItem>
+                <SelectItem value="Healthcare">Healthcare</SelectItem>
+              </SelectContent>
+            </Select>
+          </div> */}
           {isEdit && (
             <div>
               <Label>Status</Label>
