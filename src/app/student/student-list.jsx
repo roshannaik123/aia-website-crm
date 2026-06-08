@@ -9,11 +9,13 @@ import { getImageBaseUrl, getNoImageUrl } from "@/utils/imageUtils";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import moment from "moment";
 
 const StudentList = ({ enable }) => {
   const navigate = useNavigate();
+  //filter state
+  const [testimonialFilter, setTestimonialFilter] = useState("All");
 
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: STUDENT_API.list,
@@ -37,15 +39,47 @@ const StudentList = ({ enable }) => {
     () => list.filter((item) => item.student_status !== "Active"),
     [list],
   );
+
+  const filteredActiveStudents = useMemo(() => {
+    if (enable !== "testimonial" || testimonialFilter === "All") {
+      return activeStudents;
+    }
+
+    return activeStudents.filter(
+      (item) => item.student_have_testimonial === testimonialFilter,
+    );
+  }, [activeStudents, testimonialFilter, enable]);
+
+  const filteredInactiveStudents = useMemo(() => {
+    if (enable !== "testimonial" || testimonialFilter === "All") {
+      return inactiveStudents;
+    }
+
+    return inactiveStudents.filter(
+      (item) => item.student_have_testimonial === testimonialFilter,
+    );
+  }, [inactiveStudents, testimonialFilter, enable]);
+p
+  // const activeCourseGroups = useMemo(
+  //   () => getCourseGroups(activeStudents),
+  //   [activeStudents],
+  // );
+
+  // const inactiveCourseGroups = useMemo(
+  //   () => getCourseGroups(inactiveStudents),
+  //   [inactiveStudents],
+  // );
+
   const activeCourseGroups = useMemo(
-    () => getCourseGroups(activeStudents),
-    [activeStudents],
+    () => getCourseGroups(filteredActiveStudents),
+    [filteredActiveStudents],
   );
 
   const inactiveCourseGroups = useMemo(
-    () => getCourseGroups(inactiveStudents),
-    [inactiveStudents],
+    () => getCourseGroups(filteredInactiveStudents),
+    [filteredInactiveStudents],
   );
+
   const columns = [
     ...(enable == "testimonial" || enable == "recentpassout"
       ? [
@@ -478,9 +512,24 @@ const StudentList = ({ enable }) => {
 
             <TabsContent value="ALL_ACTIVE">
               <DataTable
-                data={activeStudents}
+                data={filteredActiveStudents}
                 columns={columns}
                 pageSize={50}
+                filter={
+                  enable === "testimonial" && (
+                    <div className="mb-4">
+                      <select
+                        value={testimonialFilter}
+                        onChange={(e) => setTestimonialFilter(e.target.value)}
+                        className="border rounded-md px-3 py-2"
+                      >
+                        <option value="All">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                  )
+                }
                 searchPlaceholder="Search active students..."
                 addButton={{
                   to: "/student/create",
@@ -492,11 +541,26 @@ const StudentList = ({ enable }) => {
             {activeCourseGroups.map((course) => (
               <TabsContent key={course} value={course}>
                 <DataTable
-                  data={activeStudents.filter(
+                  data={filteredActiveStudents.filter(
                     (item) => item.student_course === course,
                   )}
                   columns={columns}
                   pageSize={50}
+                  filter={
+                    enable === "testimonial" && (
+                      <div className="mb-4">
+                        <select
+                          value={testimonialFilter}
+                          onChange={(e) => setTestimonialFilter(e.target.value)}
+                          className="border rounded-md px-3 py-2"
+                        >
+                          <option value="All">All</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+                    )
+                  }
                   searchPlaceholder={`Search ${course} (Active)...`}
                   addButton={{
                     to: "/student/create",
@@ -521,9 +585,24 @@ const StudentList = ({ enable }) => {
 
             <TabsContent value="ALL_INACTIVE">
               <DataTable
-                data={inactiveStudents}
+                data={filteredInactiveStudents}
                 columns={columns}
                 pageSize={50}
+                filter={
+                  enable === "testimonial" && (
+                    <div className="mb-4">
+                      <select
+                        value={testimonialFilter}
+                        onChange={(e) => setTestimonialFilter(e.target.value)}
+                        className="border rounded-md px-3 py-2"
+                      >
+                        <option value="All">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                  )
+                }
                 searchPlaceholder="Search inactive students..."
                 addButton={{
                   to: "/student/create",
@@ -535,11 +614,24 @@ const StudentList = ({ enable }) => {
             {inactiveCourseGroups.map((course) => (
               <TabsContent key={course} value={course}>
                 <DataTable
-                  data={inactiveStudents.filter(
+                  data={filteredInactiveStudents.filter(
                     (item) => item.student_course === course,
                   )}
                   columns={columns}
                   pageSize={50}
+                  filter={
+                    <div className="mb-4">
+                      <select
+                        value={testimonialFilter}
+                        onChange={(e) => setTestimonialFilter(e.target.value)}
+                        className="border rounded-md px-3 py-2"
+                      >
+                        <option value="All">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                  }
                   searchPlaceholder={`Search ${course} (Inactive)...`}
                   addButton={{
                     to: "/student/create",
