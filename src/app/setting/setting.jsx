@@ -137,7 +137,7 @@ const Settings = () => {
                       )}
                     </button>
                   );
-                }
+                },
               )}
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
@@ -218,7 +218,7 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+      {/* <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -237,7 +237,7 @@ const Settings = () => {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

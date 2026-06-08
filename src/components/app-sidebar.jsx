@@ -56,7 +56,7 @@ const NAVIGATION_CONFIG = {
       icon: Globe,
       isActive: false,
     },
-    
+
     NEWSLETTERLIST: {
       title: "Newsletter List",
       url: "/newsletter-list",
@@ -192,7 +192,7 @@ const USER_ROLE_PERMISSIONS = {
       "GALLERYLIST",
       "BLOGLIST",
       "SIDEPOPUPLIST",
-      // "SETTINGS",
+      "SETTINGS",
     ],
     navMainReport: ["SUMMARY", "DOWNLOADS", "OTHER", "SETTINGS"],
   },
