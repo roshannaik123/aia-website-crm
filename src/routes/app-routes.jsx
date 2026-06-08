@@ -224,6 +224,7 @@ function AppRoutes() {
               </Suspense>
             }
           />
+
           <Route
             path="/add-banner"
             element={
