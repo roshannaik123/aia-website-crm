@@ -39,6 +39,7 @@ const DataTable = ({
   columns = [],
   pageSize = 10,
   searchPlaceholder = "Search...",
+  filter,
   addButton,
   extraButton,
 }) => {
@@ -84,6 +85,8 @@ const DataTable = ({
           />
         </div>
         <div className="flex flex-col md:flex-row md:ml-auto gap-2 w-full md:w-auto">
+          {filter}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-9">
