@@ -25,6 +25,7 @@ const NewsLetter = () => {
   const [openDownload, setOpenDownload] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: NEWSLETTER_API.list,
     queryKey: ["newsletter-list"],
@@ -32,12 +33,32 @@ const NewsLetter = () => {
   const newsletters = data?.data || [];
 
   const filteredNewsletters = useMemo(() => {
-    if (!searchQuery.trim()) return newsletters;
-    const query = searchQuery.toLowerCase();
-    return newsletters.filter((item) =>
-      item.newsletter_email.toLowerCase().includes(query),
-    );
-  }, [searchQuery, newsletters]);
+    let result = newsletters;
+
+    // Email Search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+
+      result = result.filter((item) =>
+        item.newsletter_email.toLowerCase().includes(query),
+      );
+    }
+
+    // Date Filter
+    if (fromDate && toDate) {
+      result = result.filter((item) => {
+        const created = moment(item.newsletter_created);
+        return created.isBetween(fromDate, toDate, "day", "[]");
+      });
+    }
+
+    return result;
+  }, [searchQuery, newsletters, fromDate, toDate]);
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setFromDate("");
+    setToDate("");
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -152,6 +173,23 @@ const NewsLetter = () => {
                     />
                   </div>
                 </motion.div>
+                <Input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="h-10 w-40"
+                />
+
+                <Input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="h-10 w-40"
+                />
+
+                <Button variant="outline" onClick={handleClearFilters}>
+                  Clear
+                </Button>
                 <Dialog open={openDownload} onOpenChange={setOpenDownload}>
                   <DialogTrigger asChild>
                     <Button>Download</Button>
@@ -236,7 +274,9 @@ const NewsLetter = () => {
                     <div className="flex items-center gap-2 mb-1 text-sm font-medium text-gray-600">
                       <Calendar className="h-4 w-4 text-purple-600" />
                       <span>
-                        {moment(item.newsletter_created).format("MMM DD, YYYY")}
+                        {moment(item.newsletter_created).format(
+                          "DD MMMM YYYY",
+                        )}{" "}
                       </span>
                     </div>
 

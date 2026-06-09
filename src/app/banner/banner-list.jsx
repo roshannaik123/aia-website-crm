@@ -1,11 +1,13 @@
 import ApiErrorPage from "@/components/api-error/api-error";
 import DataTable from "@/components/common/data-table";
+import FilterDropDown from "@/components/common/filterDropDown";
 import ImageCell from "@/components/common/ImageCell";
 import LoadingBar from "@/components/loader/loading-bar";
 import { BANNER_API } from "@/constants/apiConstants";
 import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import { getImageBaseUrl, getNoImageUrl } from "@/utils/imageUtils";
 import { Edit } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const BannerList = () => {
@@ -19,9 +21,76 @@ const BannerList = () => {
     queryKey: ["banner-list"],
   });
 
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const [bannerForFilter, setBannerForFilter] = useState("All");
   const IMAGE_FOR = "Banner";
   const bannerBaseUrl = getImageBaseUrl(data?.image_url, IMAGE_FOR);
   const noImageUrl = getNoImageUrl(data?.image_url);
+
+  const bannerData = data?.data || [];
+  const bannerFor = [
+    ...new Set(bannerData.map((bannerData) => bannerData.banner_for)),
+  ];
+  const filterBannerFor = (
+    <FilterDropDown
+      value={bannerForFilter}
+      onChange={setBannerForFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "All", value: "All" },
+        ...bannerFor.map((item) => ({
+          label: item,
+          value: item,
+        })),
+      ]}
+    />
+  );
+
+  const bannerForFiltered =
+    bannerForFilter === "All"
+      ? bannerData
+      : bannerData.filter((item) => item.banner_for === bannerForFilter);
+
+  const filteredData =
+    statusFilter === "All"
+      ? bannerForFiltered
+      : bannerForFiltered.filter((item) => item.banner_status === statusFilter);
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
 
   const columns = [
     {
@@ -99,8 +168,10 @@ const BannerList = () => {
   return (
     <>
       <DataTable
-        data={data?.data || []}
+        data={filteredData}
         columns={columns}
+        filter={filterDropdown}
+        filterBannerFor={filterBannerFor}
         pageSize={20}
         searchPlaceholder="Search banners..."
         addButton={{

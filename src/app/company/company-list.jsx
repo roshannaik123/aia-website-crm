@@ -10,6 +10,7 @@ import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CompanyDialog from "./create-company";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const CompanyList = () => {
   const {
@@ -26,7 +27,39 @@ const CompanyList = () => {
   const IMAGE_FOR = "Student Company";
   const companyBaseUrl = getImageBaseUrl(data?.image_url, IMAGE_FOR);
   const noImageUrl = getNoImageUrl(data?.image_url);
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const companyData = data?.data || [];
+  const filteredItems =
+    statusFilter === "All"
+      ? companyData
+      : companyData.filter(
+          (item) => item.student_company_status === statusFilter,
+        );
 
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
   const columns = [
     {
       header: "Image",
@@ -104,9 +137,10 @@ const CompanyList = () => {
   return (
     <>
       <DataTable
-        data={data?.data || []}
+        data={filteredItems}
         columns={columns}
         pageSize={50}
+        filter={filterDropdown}
         searchPlaceholder="Search companies..."
         addButton={{
           onClick: handleCreate,

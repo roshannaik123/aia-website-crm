@@ -23,27 +23,76 @@ import {
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const BlogList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const [trendingFilter, setTrendingFilter] = useState("All");
+
   const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: BLOG_API.list,
     queryKey: ["blog-list"],
   });
-
   const { trigger: deleteTrigger, loading: isDeleting } = useApiMutation();
+  const blogData = data?.data || [];
+  const filteredItems = blogData.filter((item) => {
+    const statusMatch =
+      statusFilter === "All" || item.blog_status === statusFilter;
 
-  const list = data?.data || [];
+    const trendingMatch =
+      trendingFilter === "All" ||
+      String(item.blog_trending).toLowerCase() === trendingFilter.toLowerCase();
+
+    return statusMatch && trendingMatch;
+  });
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+      h-9
+      text-sm
+      font-normal
+     bg-gray-50
+      border
+    border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
+  const trendingDropdown = (
+    <FilterDropDown
+      value={trendingFilter}
+      onChange={setTrendingFilter}
+      className="w-[140px] h-9 text-sm font-normal bg-gray-50 border border-gray-200 rounded-md px-3 text-gray-700"
+      options={[
+        { label: "Yes", value: "Yes" },
+        { label: "No", value: "No" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
+
   const IMAGE_FOR = "Blog";
   const blogBaseUrl = getImageBaseUrl(data?.image_url, IMAGE_FOR);
   const noImageUrl = getNoImageUrl(data?.image_url);
 
   const courses = useMemo(
-    () => [...new Set(list.map((blog) => blog.blog_course))],
-    [list],
+    () => [...new Set(blogData.map((blog) => blog.blog_course))],
+    [blogData],
   );
 
   const handleDeleteClick = (blog) => {
@@ -176,7 +225,9 @@ const BlogList = () => {
 
         <TabsContent value="ALL">
           <DataTable
-            data={list}
+            data={filteredItems}
+            filter={filterDropdown}
+            trendingFilter={trendingDropdown}
             columns={columns}
             pageSize={50}
             searchPlaceholder="Search blogs..."
@@ -185,13 +236,14 @@ const BlogList = () => {
         </TabsContent>
 
         {courses.map((course) => {
-          const filteredData = list.filter(
+          const filteredData = filteredItems.filter(
             (blog) => blog.blog_course === course,
           );
           return (
             <TabsContent key={course} value={course}>
               <DataTable
                 data={filteredData}
+                filter={filterDropdown}
                 columns={columns}
                 pageSize={50}
                 searchPlaceholder={`Search ${course} blogs...`}
