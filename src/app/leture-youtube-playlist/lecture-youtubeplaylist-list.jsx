@@ -9,15 +9,48 @@ import { Edit } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LectureYoutubePlaylistDialog from "./lecture-youtubeplaylist-form";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const LetureYoutubePlayList = () => {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("Active");
+
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: LETUREYOUTUBEPLAYLIST_API.list,
     queryKey: ["lecture-youtube-playlist-list"],
   });
-
+  const playListData = data?.data || [];
+  const filteredItems =
+    statusFilter === "All"
+      ? playListData
+      : playListData.filter(
+          (item) => item.youtube_playlist_status === statusFilter,
+        );
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
   const columns = [
     {
       header: "Sort",
@@ -76,9 +109,10 @@ const LetureYoutubePlayList = () => {
   return (
     <div className="space-y-4">
       <DataTable
-        data={data?.data ?? []}
+        data={filteredItems}
         columns={columns}
         pageSize={50}
+        filter={filterDropdown}
         searchPlaceholder="Search Playlist..."
         addButton={{
           onClick: handleCreate,

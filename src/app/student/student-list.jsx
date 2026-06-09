@@ -11,12 +11,27 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMemo, useState } from "react";
 import moment from "moment";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const StudentList = ({ enable }) => {
   const navigate = useNavigate();
-  //filter state
-  const [testimonialFilter, setTestimonialFilter] = useState("All");
 
+  const filterFieldMap = {
+    testimonial: "student_have_testimonial",
+    youtube: "student_have_youtube",
+    certificate: "student_have_certificate",
+    story: "student_have_story",
+    officeimage: "student_have_office_image",
+    map: "student_have_map",
+    screenshot: "student_have_screenshot",
+    top: "student_is_top",
+    recentpassout: "student_recent_passout",
+  };
+
+  const filterField = filterFieldMap[enable];
+
+  //filter state
+  const [statusFilter, setStatusFilter] = useState("Yes");
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: STUDENT_API.list,
     queryKey: ["student-list"],
@@ -41,25 +56,23 @@ const StudentList = ({ enable }) => {
   );
 
   const filteredActiveStudents = useMemo(() => {
-    if (enable !== "testimonial" || testimonialFilter === "All") {
+    if (!filterField || statusFilter === "All") {
       return activeStudents;
     }
 
-    return activeStudents.filter(
-      (item) => item.student_have_testimonial === testimonialFilter,
-    );
-  }, [activeStudents, testimonialFilter, enable]);
+    return activeStudents.filter((item) => item[filterField] === statusFilter);
+  }, [activeStudents, statusFilter, enable]);
 
   const filteredInactiveStudents = useMemo(() => {
-    if (enable !== "testimonial" || testimonialFilter === "All") {
+    if (!filterField || statusFilter === "All") {
       return inactiveStudents;
     }
 
     return inactiveStudents.filter(
-      (item) => item.student_have_testimonial === testimonialFilter,
+      (item) => item[filterField] === statusFilter,
     );
-  }, [inactiveStudents, testimonialFilter, enable]);
-p
+  }, [inactiveStudents, statusFilter, enable]);
+
   // const activeCourseGroups = useMemo(
   //   () => getCourseGroups(activeStudents),
   //   [activeStudents],
@@ -487,6 +500,30 @@ p
       ),
     },
   ];
+  const filterDropdown = filterField ? (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+      h-9
+      text-sm
+      font-normal
+     bg-gray-50
+      border
+    border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Yes", value: "Yes" },
+        { label: "No", value: "No" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  ) : null;
 
   if (isLoading) return <LoadingBar />;
   if (isError) return <ApiErrorPage onRetry={refetch} />;
@@ -515,21 +552,7 @@ p
                 data={filteredActiveStudents}
                 columns={columns}
                 pageSize={50}
-                filter={
-                  enable === "testimonial" && (
-                    <div className="mb-4">
-                      <select
-                        value={testimonialFilter}
-                        onChange={(e) => setTestimonialFilter(e.target.value)}
-                        className="border rounded-md px-3 py-2"
-                      >
-                        <option value="All">All</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
-                  )
-                }
+                filter={filterDropdown}
                 searchPlaceholder="Search active students..."
                 addButton={{
                   to: "/student/create",
@@ -546,21 +569,7 @@ p
                   )}
                   columns={columns}
                   pageSize={50}
-                  filter={
-                    enable === "testimonial" && (
-                      <div className="mb-4">
-                        <select
-                          value={testimonialFilter}
-                          onChange={(e) => setTestimonialFilter(e.target.value)}
-                          className="border rounded-md px-3 py-2"
-                        >
-                          <option value="All">All</option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </div>
-                    )
-                  }
+                  filter={filterDropdown}
                   searchPlaceholder={`Search ${course} (Active)...`}
                   addButton={{
                     to: "/student/create",
@@ -588,21 +597,7 @@ p
                 data={filteredInactiveStudents}
                 columns={columns}
                 pageSize={50}
-                filter={
-                  enable === "testimonial" && (
-                    <div className="mb-4">
-                      <select
-                        value={testimonialFilter}
-                        onChange={(e) => setTestimonialFilter(e.target.value)}
-                        className="border rounded-md px-3 py-2"
-                      >
-                        <option value="All">All</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
-                  )
-                }
+                filter={filterDropdown}
                 searchPlaceholder="Search inactive students..."
                 addButton={{
                   to: "/student/create",
@@ -619,19 +614,7 @@ p
                   )}
                   columns={columns}
                   pageSize={50}
-                  filter={
-                    <div className="mb-4">
-                      <select
-                        value={testimonialFilter}
-                        onChange={(e) => setTestimonialFilter(e.target.value)}
-                        className="border rounded-md px-3 py-2"
-                      >
-                        <option value="All">All</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                    </div>
-                  }
+                  filter={filterDropdown}
                   searchPlaceholder={`Search ${course} (Inactive)...`}
                   addButton={{
                     to: "/student/create",

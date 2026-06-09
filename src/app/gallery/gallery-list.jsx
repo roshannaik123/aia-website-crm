@@ -10,6 +10,7 @@ import { Copy } from "lucide-react";
 import GalleryEdit from "./gallery-edit";
 import { toast } from "sonner";
 import GalleryCreate from "./gallery-create";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const GalleryList = () => {
   const { data, isLoading, isError, refetch } = useGetApiMutation({
@@ -23,7 +24,38 @@ const GalleryList = () => {
   const noImageUrl = getNoImageUrl(data?.image_url);
 
   const [copiedId, setCopiedId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const galleryData = data?.data || [];
 
+  const filteredItems =
+    statusFilter === "All"
+      ? galleryData
+      : galleryData.filter((item) => item.gallery_status === statusFilter);
+
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
   const handleCopyClipboard = async (id, text) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -132,8 +164,9 @@ const GalleryList = () => {
       {isLoading && <LoadingBar />}
 
       <DataTable
-        data={data?.data || []}
+        data={filteredItems}
         columns={columns}
+        filter={filterDropdown}
         pageSize={20}
         searchPlaceholder="Search gallery..."
         extraButton={<GalleryCreate />}

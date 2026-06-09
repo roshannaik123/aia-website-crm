@@ -9,6 +9,7 @@ import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import { getImageBaseUrl, getNoImageUrl } from "@/utils/imageUtils";
 import { Edit } from "lucide-react";
 import PopupEdit from "./popup-edit";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const PopupList = () => {
   const { data, isLoading, isError, refetch } = useGetApiMutation({
@@ -22,11 +23,46 @@ const PopupList = () => {
 
   const [selectedPopupId, setSelectedPopupId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("Yes");
+
+  // filterThe items
+
+  const popupList = data?.data || [];
+
+  const filteredItems =
+    statusFilter === "All"
+      ? popupList
+      : popupList.filter((item) => item.popup_required === statusFilter);
 
   const handleEdit = (popupId) => {
     setSelectedPopupId(popupId);
     setIsDialogOpen(true);
   };
+
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+      h-9
+      text-sm
+      font-normal
+     bg-gray-50
+      border
+    border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Yes", value: "Yes" },
+        { label: "No", value: "No" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
 
   const columns = [
     {
@@ -71,8 +107,9 @@ const PopupList = () => {
       {isLoading && <LoadingBar />}
 
       <DataTable
-        data={data?.data || []}
+        data={filteredItems}
         columns={columns}
+        filter={filterDropdown}
         pageSize={20}
         searchPlaceholder="Search popups..."
       />

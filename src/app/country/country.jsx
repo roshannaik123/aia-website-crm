@@ -7,14 +7,47 @@ import { useGetApiMutation } from "@/hooks/useGetApiMutation";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import CountryForm from "./country-form";
+import FilterDropDown from "@/components/common/filterDropDown";
 
 const CountryList = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("Active");
+
   const { data, isLoading, isError, refetch } = useGetApiMutation({
     url: COUNTRY_API.list,
     queryKey: ["countrylist"],
   });
+  const countryData = data?.data || [];
+  const filteredItems =
+    statusFilter === "All"
+      ? countryData
+      : countryData.filter((item) => item.country_status === statusFilter);
+
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+ h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
 
   const handleCreate = () => {
     setSelectedId(null);
@@ -79,9 +112,10 @@ const CountryList = () => {
       {isLoading && <LoadingBar />}
 
       <DataTable
-        data={data?.data || []}
+        data={filteredItems}
         columns={columns}
         pageSize={50}
+        filter={filterDropdown}
         searchPlaceholder="Search country..."
         addButton={{
           onClick: handleCreate,

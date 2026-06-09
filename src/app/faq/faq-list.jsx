@@ -1,4 +1,5 @@
 import ApiErrorPage from "@/components/api-error/api-error";
+import FilterDropDown from "@/components/common/filterDropDown";
 import LoadingBar from "@/components/loader/loading-bar";
 import ToggleStatus from "@/components/toogle/status-toogle";
 import { Button } from "@/components/ui/button";
@@ -17,17 +18,50 @@ const FaqList = () => {
     url: FAQ_API.list,
     queryKey: ["faq-list"],
   });
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const faqData = data?.data || [];
+
+  const filteredItems =
+    statusFilter === "All"
+      ? faqData
+      : faqData.filter((item) => item.faq_status === statusFilter);
+
+  const filterDropdown = (
+    <FilterDropDown
+      value={statusFilter}
+      onChange={setStatusFilter}
+      className="w-[140px]
+h-9
+text-sm
+font-normal
+bg-gray-50
+border
+border-gray-200
+rounded-md
+px-3
+text-gray-700
+focus:border-gray-300
+focus:ring-gray-200
+"
+      options={[
+        { label: "Active", value: "Active" },
+        { label: "Inactive", value: "Inactive" },
+        { label: "All", value: "All" },
+      ]}
+    />
+  );
+
   const filteredData = useMemo(() => {
-    const list = data?.data ?? [];
+    const list = filteredItems;
 
     if (!searchTerm.trim()) return list;
 
     return list.filter((faq) =>
       (faq?.page_two_name ?? "")
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+        .includes(searchTerm.toLowerCase()),
     );
-  }, [data, searchTerm]);
+  }, [filteredItems, searchTerm]);
   if (isLoading) return <LoadingBar />;
 
   if (isError) return <ApiErrorPage onRetry={refetch} />;
@@ -48,6 +82,7 @@ const FaqList = () => {
               className="pl-10 bg-white"
             />
           </div>
+          {filterDropdown}
 
           <Button
             className="w-full sm:w-auto gap-2 "
